@@ -23,5 +23,12 @@ build/
 # Local / OS
 .DS_Store
 
-# IGNITION local data (optional: uncomment to ignore session artifacts in-repo)
-# ignition_data/
+# IGNITION — machine-local data (sessions, receipts, exports). Keep directory
+# placeholders via `.gitkeep` only. Do **not** ignore `ignition.toml`; that file is
+# usually committed so the team shares defaults.
+ignition_data/sessions/*
+!ignition_data/sessions/.gitkeep
+ignition_data/receipts/*
+!ignition_data/receipts/.gitkeep
+ignition_data/exports/*
+!ignition_data/exports/.gitkeep
