@@ -1,0 +1,17 @@
+# IGNITION — session boundaries around Git (repo: IGNITION)
+default_branch = "main"
+default_feature_branch_prefix = "feature/"
+plain_language = false
+recommendation_mode = "balanced"
+receipt_template = "default"
+
+# Uncomment to run tests on checkpoint/status when you do not pass --no-test:
+auto_checkpoint_test_command = "pytest -q"
+auto_status_test_command = "pytest -q"
+
+# Per-project defaults (optional):
+# [project]
+# preferred_scope = ["src/", "tests/"]
+# test_command = "pytest -q"   # used if top-level test commands are unset
+# feature_prefix = "feature/"
+
