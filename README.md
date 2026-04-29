@@ -162,6 +162,47 @@ IGNITION is meant to be **safe to rely on for months**: session and receipt JSON
 
 **Recovery:** If `current_session.json` or a session file is corrupt, commands **fail softly** where possible (`doctor` warns; `list` skips bad files; `current` reports a pointer error). Use `ignition export` periodically for backup before risky edits.
 
+## v9: machine-readable surface (MCP server)
+
+IGNITION ships an optional **MCP server** (Model Context Protocol) so agent clients — Claude in Cowork, IDE extensions, etc. — can read session state and start / resume sessions over a structured protocol. Same on-disk format as the CLI; no parallel state.
+
+| Tool | Role |
+|------|------|
+| `ignition_current` | Active-session snapshot, or `{"active": false}` if none. |
+| `ignition_next` | Carry-forward block from the last stopped session on this branch. |
+| `ignition_status` | Full status view: scope, drift, last checkpoint, recent commits. |
+| `ignition_init` | Create `ignition.toml` and data dirs. Refuses to clobber unless `force=true`. |
+| `ignition_begin` | Start a session. Guards against duplicate-on-same-branch and pointer-from-another-clone (overridable with `force=true`). |
+| `ignition_resume` | Rebind the active pointer to an unfinished session. |
+
+Tool names retain the `ignition_` prefix on purpose so they stay unambiguous in multi-MCP agent transcripts (where bare `current` or `begin` would collide with other servers).
+
+**Install:**
+
+```bash
+pip install -e ".[mcp]"
+ignition-mcp --help
+```
+
+**Cowork `mcp.json` snippet:**
+
+```json
+{
+  "mcpServers": {
+    "ignition": {
+      "command": "/abs/path/to/IGNITION/.venv/bin/ignition-mcp",
+      "env": { "IGNITION_DEFAULT_PROJECT": "${workspaceFolder}" }
+    }
+  }
+}
+```
+
+`IGNITION_DEFAULT_PROJECT` is the fallback for any tool called without an explicit `project_path` argument (mirrors KeySmith's `KEYSMITH_DEFAULT_PROJECT`).
+
+**Errors are data, not exceptions.** Every tool wraps its body in try/except and returns `{"error": "...", "code": "..."}` on failure (matches KeySmith's pattern) so agent clients can react instead of seeing tool-error termination.
+
+**Round-trips with the CLI.** Sessions started via `ignition_begin` are bit-for-bit identical on disk to those started via `ignition start`. You can mix and match — start via the agent, checkpoint via the CLI, stop via either.
+
 ## Messy-but-professional workflow
 
 1. `ignition start --task "real task" --scope src/,tests/`
@@ -229,8 +270,11 @@ plain_language = false   # true: softer phrasing in the terminal for some comman
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-pip install -e ".[dev]"
+pip install -e ".[dev]"            # CLI only
+# or, with the MCP server:
+pip install -e ".[dev,mcp]"
 ignition --help
+ignition-mcp --help                 # available with the [mcp] extra
 ```
 
 ## Engineering discipline
