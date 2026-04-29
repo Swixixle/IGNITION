@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ignition"
-version = "0.8.0"
+version = "0.9.0"
 description = "Session-control CLI for coding work: bounded sessions, checkpoints, and receipts around Git."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -18,9 +18,13 @@ dependencies = [
 dev = [
   "pytest>=8.0.0",
 ]
+mcp = [
+  "mcp>=1.2.0",
+]
 
 [project.scripts]
 ignition = "ignition.cli:app"
+ignition-mcp = "ignition.mcp.server:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
