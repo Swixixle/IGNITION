@@ -1,10 +1,23 @@
+################################################################################
+# REPLACEMENT pyproject.toml for the IGNITION repo.
+#
+# Diff vs. the existing file (https://github.com/Swixixle/IGNITION/blob/main/pyproject.toml):
+#   * version          0.8.0  ->  0.9.0  (new ignition_mcp package, public surface change)
+#   * optional-deps    added [mcp] extra
+#   * scripts          added `ignition-mcp` console entry
+#   * packages.find    no change — both `ignition` and `ignition_mcp` live under src/
+#
+# Drop this file in at the repo root. The only behavioural change for users
+# who do NOT install the [mcp] extra is the version bump.
+################################################################################
+
 [build-system]
 requires = ["setuptools>=61", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "ignition"
-version = "0.8.0"
+version = "0.9.0"
 description = "Session-control CLI for coding work: bounded sessions, checkpoints, and receipts around Git."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -18,9 +31,16 @@ dependencies = [
 dev = [
   "pytest>=8.0.0",
 ]
+# Install with: pip install -e ".[mcp]"
+# Brings in the official Model Context Protocol Python SDK so the
+# `ignition-mcp` console script can launch a stdio MCP server.
+mcp = [
+  "mcp>=1.2.0",
+]
 
 [project.scripts]
 ignition = "ignition.cli:app"
+ignition-mcp = "ignition_mcp:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
